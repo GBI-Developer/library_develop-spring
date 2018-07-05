@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 修正履歴 -->
+<!--  2018/06/09 GBI:tomori (selectUserInfo)ユーザ一覧情報を取得するSQLを追加 -->
+
+<mapper namespace="com.web.library.dao.ex.entity.TUserInfoMapperEx" >
+<!-- 標準EntityBean -->
+<resultMap id="BaseResultMap" type="com.web.library.dao.ex.entity.TUserInfoEx" >
+    <id column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_pass" jdbcType="VARCHAR" property="userPass" />
+    <result column="mng_user_id" jdbcType="VARCHAR" property="mngUserId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="user_address" jdbcType="VARCHAR" property="userAddress" />
+    <result column="user_sex_kbn" jdbcType="CHAR" property="userSexKbn" />
+    <result column="user_age" jdbcType="VARCHAR" property="userAge" />
+    <result column="user_registe_date" jdbcType="VARCHAR" property="userRegisteDateToString" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <!-- 関連TBL T_USER_STATUS -->
+    <result column="user_num_lending" jdbcType="VARCHAR" property="userNumLending" />
+</resultMap>
+
+<!-- 関連EntityBean -->
+<resultMap id="CollectionResultMap" type="com.web.library.dao.ex.entity.TUserInfoEx" extends="com.web.library.dao.generate.entity.TUserInfoMapper.BaseResultMap">
+    <collection property="tUserInfo" ofType="com.web.library.dao.generate.entity.TUserInfo" resultMap="com.web.library.dao.generate.entity.TUserInfoMapper.BaseResultMap"/>
+</resultMap>
+
+  <!-- ユーザ一覧情報を取得する -->
+  <select id="selectUserInfo"  parameterType="java.lang.String" resultMap="BaseResultMap">
+  <![CDATA[
+    SELECT
+        tui.user_id,
+        tui.user_name,
+        tui.user_address,
+        tui.user_sex_kbn,
+        tui.user_age,
+        tui.user_registe_date,
+        tus.user_num_lending
+    FROM
+        t_user_info tui
+    JOIN
+        t_user_status tus ON tui.user_id = tus.user_id
+    ]]>
+  </select>
+
+</mapper>
+

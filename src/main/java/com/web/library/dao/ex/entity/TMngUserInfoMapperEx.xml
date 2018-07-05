@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 修正履歴 -->
+<!--  2018/06/09 GBI:tomori (selectUserRegisteredManagerList)管理者が登録した利用者情報を取得するSQLを追加 -->
+
+<mapper namespace="com.web.library.dao.ex.entity.TMngUserInfoMapperEx" >
+<!-- 標準EntityBean -->
+<resultMap id="BaseResultMap" type="com.web.library.dao.generate.entity.TMngUserInfo" >
+        <id column="mng_user_id" property="mngUserId" />
+        <result column="mng_user_name" property="mngUserName" />
+        <result column="mng_user_pass" property="mngUserPass" />
+        <result column="mng_regist_date" property="mngRegistDate" />
+</resultMap>
+<!-- 関連EntityBean -->
+<resultMap id="CollectionResultMap" type="com.web.library.dao.ex.entity.TMngUserInfoEx" extends="com.web.library.dao.generate.entity.TMngUserInfoMapper.BaseResultMap">
+    <collection property="tUserInfo" ofType="com.web.library.dao.generate.entity.TUserInfo" resultMap="com.web.library.dao.generate.entity.TUserInfoMapper.BaseResultMap"/>
+    <collection property="tBookInfo" ofType="com.web.library.dao.generate.entity.TBookInfo" resultMap="com.web.library.dao.generate.entity.TBookInfoMapper.BaseResultMap"/>
+</resultMap>
+
+  <!-- 管理者情報を取得する -->
+  <select id="selectMngUser"  parameterType="java.lang.String" resultMap="BaseResultMap">
+   <![CDATA[
+    SELECT
+        mng_user_id,
+        mng_user_name,
+        mng_user_pass,
+        mng_regist_date
+    FROM
+        t_mng_user_info
+    WHERE
+        mng_user_id = #{mngUserId}
+    AND
+        mng_user_pass = #{mngUserPass}
+    ]]>
+  </select>
+
+  <!-- 管理者が登録した利用者情報を取得する -->
+  <select id="selectUserRegisteredManagerList"  parameterType="java.lang.String" resultMap="CollectionResultMap">
+  <![CDATA[
+    SELECT
+        tmui.mng_user_id,
+        tmui.mng_user_name,
+        tmui.mng_user_pass,
+        tmui.mng_regist_date,
+        tui.user_id,
+        tui.user_pass,
+        tui.mng_user_id,
+        tui.user_name,
+        tui.user_address,
+        tui.user_sex_kbn,
+        tui.user_age,
+        tui.user_registe_date
+    FROM
+        t_mng_user_info tmui
+    INNER JOIN
+        t_user_info tui ON
+        tui.mng_user_id = tmui.mng_user_id
+    WHERE
+        tmui.mng_user_id = #{mngUserId}
+    ]]>
+  </select>
+</mapper>
+

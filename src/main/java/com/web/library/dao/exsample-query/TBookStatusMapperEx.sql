@@ -1,0 +1,14 @@
+-- com.web.library.dao.ex.entity.TBookStatusMapperEx updateLend--
+update
+	T_BOOK_STATUS
+SET
+	BOOK_LEND_HISTORY = case BOOK_ID
+WHEN '10002' THEN CONCAT(BOOK_LEND_HISTORY,'10002,')
+WHEN '10003' THEN CONCAT(BOOK_LEND_HISTORY,'10002,')
+WHEN '10004' THEN CONCAT(BOOK_LEND_HISTORY,'10002,')
+END
+, BOOK_NUM_LENDING = BOOK_NUM_LENDING + 1
+, BOOK_LEND_STATUS = 1
+, update_user = 'user103'
+, version_no = version_no + 1
+WHERE BOOK_ID IN ('10002','10003','10004');

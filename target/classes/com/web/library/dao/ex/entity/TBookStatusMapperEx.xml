@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 修正履歴 -->
+<!--  2018/06/09 GBI:tomori (updateLend)図書状態管理TBLに貸出更新をするSQLを追加 -->
+
+<mapper namespace="com.web.library.dao.ex.entity.TBookStatusMapperEx" >
+<!-- 標準EntityBean -->
+<resultMap id="BaseResultMap" type="com.web.library.dao.generate.entity.TBookStatus" >
+    <id column="BOOK_ID" jdbcType="VARCHAR" property="bookId" />
+    <result column="BOOK_LEND_HISTORY" jdbcType="VARCHAR" property="bookLendHistory" />
+    <result column="BOOK_LEND_STATUS" jdbcType="CHAR" property="bookLendStatus" />
+    <result column="BOOK_NUM_LENDING" jdbcType="VARCHAR" property="bookNumLending" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="VERSION_NO" jdbcType="INTEGER" property="versionNo" />
+</resultMap>
+
+  <!-- 貸出更新をする -->
+  <update id="updateLend" >
+    UPDATE
+        t_book_status
+    SET
+        book_lend_history = CASE book_id
+     <foreach item="item" index="index" collection="bookIdList">
+        WHEN #{item} THEN CONCAT(book_lend_history,#{userId})
+     </foreach>
+    END
+    , book_num_lending = book_num_lending + 1
+    , book_lend_status = 1
+    , update_user = #{mngUserName}
+    , version_no = version_no + 1
+    WHERE
+       book_id IN
+     <foreach item="item" index="index" collection="bookIdList"
+              open="(" separator="," close=")">
+       #{item}
+     </foreach>
+  </update>
+
+</mapper>
+

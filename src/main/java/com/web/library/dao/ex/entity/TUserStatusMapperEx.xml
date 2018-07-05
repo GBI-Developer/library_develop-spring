@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 修正履歴 -->
+<!--  2018/06/09 GBI:tomori (updateLend)ユーザ状態管理TBLに貸出更新をするSQLを追加 -->
+<mapper namespace="com.web.library.dao.ex.entity.TUserStatusMapperEx" >
+
+  <!-- 貸出更新をする -->
+  <update id="updateLend">
+  <![CDATA[
+    UPDATE
+        t_user_status
+    SET
+        user_history = #{booksId}
+      , user_num_lending = user_num_lending + #{lendNum}
+      , update_user = #{mngUserName}
+      , version_no = version_no + 1
+    WHERE
+        user_id = #{userId};
+    ]]>
+  </update>
+
+</mapper>
+

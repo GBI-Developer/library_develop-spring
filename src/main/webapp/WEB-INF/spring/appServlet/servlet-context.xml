@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SpringMVCフォーマット宣言 -->
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- アノテーション利用宣言 -->
+	<annotation-driven />
+
+	<!-- DispatcherServlet経由で静的リソースにアクセスするための設定 -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- DIコンテナにViewResolverを登録 -->
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- InternalResourceViewResolverはプレフィックスとサフィックスからViewオブジェクトを生成するUrlBasedViewRedolverのサブクラス -->
+
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+		<!-- InternalResourceViewResolverにView名を渡すと「{プレフィックス}{View名}{サフィックス}」のViewオブジェクトが生成される -->
+
+	</beans:bean>
+
+    <beans:bean id="messageSource"
+        class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <beans:property name="basenames">
+            <beans:list>
+                <beans:value>classpath:ValidatorMessages</beans:value>
+                <beans:value>/WEB-INF/messages/messages</beans:value>
+            </beans:list>
+        </beans:property>
+        <beans:property name="defaultEncoding" value="UTF-8" />
+    </beans:bean>
+
+	<!-- Controllerクラスを自動でDIコンテナに登録 -->
+    <context:component-scan base-package="com.web.library.app.controller" />
+     </beans:beans>

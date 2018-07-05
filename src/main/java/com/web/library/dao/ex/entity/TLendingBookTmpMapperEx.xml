@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 修正履歴 -->
+<!--  2018/06/09 GBI:tomori (selectUserExceedingList)超過者一覧情報を取得するSQLを追加 -->
+<!--  2018/06/09 GBI:tomori (selectBookExceedingList)超過図書一覧情報を取得するSQLを追加 -->
+<!--  2018/06/09 GBI:tomori (updateLend)貸出更新をするSQLを追加 -->
+
+<mapper namespace="com.web.library.dao.ex.entity.TLendingBookTmpMapperEx" >
+<!-- 標準EntityBean -->
+<resultMap id="BaseResultMap" type="com.web.library.dao.ex.entity.TLendingBookTmpEx" >
+    <id column="BOOK_ID" jdbcType="VARCHAR" property="bookId" />
+    <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+    <result column="LENDING_DATE" jdbcType="DATE" property="lendingDate" />
+    <result column="RETURN_DATE" jdbcType="DATE" property="returnDate" />
+    <result column="MNG_USER_ID" jdbcType="VARCHAR" property="mngUserId" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="UPDATE_USER" jdbcType="VARCHAR" property="updateUser" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <!-- 関連TBL T_USER_STATUS -->
+    <result column="USER_NUM_LENDING" jdbcType="VARCHAR" property="userNumLending" />
+</resultMap>
+
+  <!-- 超過者一覧情報を取得する -->
+  <select id="selectUserExceedingList"  parameterType="java.lang.String" resultMap="BaseResultMap">
+  <![CDATA[
+    SELECT
+        count(tlbt.book_id) as count,
+        tui.user_id,
+        tui.user_name,
+        user_address,
+        user_sex_kbn,
+        user_age
+    FROM
+        t_lending_book_tmp tlbt
+    LEFT JOIN
+        t_user_status tus ON tlbt.user_id = tus.user_id
+    LEFT JOIN
+        t_user_info tui ON tui.user_id = tlbt.user_id
+    WHERE
+        tlbt.return_date < DATE(NOW())
+    GROUP BY
+        tlbt.user_id
+    HAVING
+        COUNT(book_id) > 0
+    ORDER BY
+        tlbt.user_id
+    ]]>
+  </select>
+
+  <!-- 超過図書一覧情報を取得する -->
+  <select id="selectBookExceedingList"  parameterType="java.lang.String" resultMap="BaseResultMap">
+  <![CDATA[
+	SELECT
+        tlbt.user_id,
+        tlbt.book_id,
+        tbi.title,
+        tlbt.lending_date,
+        tlbt.return_date
+    FROM
+        t_lending_book_tmp tlbt
+    LEFT JOIN
+        t_book_info tbi ON tlbt.book_id = tbi.book_id
+    WHERE
+        tlbt.return_date < DATE(NOW())
+    ORDER BY
+        tlbt.book_id
+    ]]>
+  </select>
+
+    <!-- 貸出更新をする -->
+  <insert id="updateLend" >
+	INSERT INTO
+	    t_lending_book_tmp
+	    (book_id, user_id, lending_date, return_date, mng_user_id, create_user)
+	VALUES
+     <foreach item="item" index="index" collection="bookIdList" separator=",">
+       (#{item}, #{userId}, CURRENT_DATE(), #{returnDate}, #{mngUserId}, #{mngUserName})
+     </foreach>
+  </insert>
+
+</mapper>
+

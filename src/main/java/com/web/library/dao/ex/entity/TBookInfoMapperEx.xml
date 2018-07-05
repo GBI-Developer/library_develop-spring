@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 修正履歴 -->
+<!--  2018/06/09 GBI:tomori (selectBookInfo)図書一覧情報を取得するSQLを追加 -->
+<!--  2018/06/09 GBI:tomori (selectCheckedBooksList)チェックした図書一覧を取得するSQLを追加 -->
+
+<mapper namespace="com.web.library.dao.ex.entity.TBookInfoMapperEx" >
+<!-- 標準EntityBean -->
+<resultMap id="BaseResultMap" type="com.web.library.dao.ex.entity.TBookInfoEx" >
+    <id column="BOOK_ID" jdbcType="VARCHAR" property="bookId" />
+    <result column="TITLE" jdbcType="VARCHAR" property="title" />
+    <result column="WINDING_NEXT" jdbcType="VARCHAR" property="windingNext" />
+    <result column="SERIES" jdbcType="VARCHAR" property="series" />
+    <result column="VERSION_DISPLAY" jdbcType="VARCHAR" property="versionDisplay" />
+    <result column="AUTHOR" jdbcType="VARCHAR" property="author" />
+    <result column="PUBLISHER" jdbcType="VARCHAR" property="publisher" />
+    <result column="YEAR_PUBLICATION" jdbcType="VARCHAR" property="yearPublication" />
+    <result column="ISBN" jdbcType="VARCHAR" property="isbn" />
+    <result column="NUMBER_PAGES_H_W" jdbcType="VARCHAR" property="numberPagesHW" />
+    <result column="SCOPE_DISCLOSUER" jdbcType="VARCHAR" property="scopeDisclosuer" />
+    <result column="MNG_USER_ID" jdbcType="VARCHAR" property="mngUserId" />
+    <result column="BOOK_REGISTE_DATE" jdbcType="VARCHAR" property="bookRegisteDateToString" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="UPDATE_DATE" jdbcType="TIMESTAMP" property="updateDate" />
+    <!-- 関連TBL T_BOOK_STATUS -->
+    <result column="BOOK_NUM_LENDING" jdbcType="VARCHAR" property="bookNumLending" />
+    <result column="BOOK_LEND_STATUS" jdbcType="VARCHAR" property="bookLendStatus" />
+</resultMap>
+
+<!-- 関連EntityBean -->
+<resultMap id="CollectionResultMap" type="com.web.library.dao.ex.entity.TUserInfoEx" extends="com.web.library.dao.generate.entity.TUserInfoMapper.BaseResultMap">
+    <collection property="tUserInfo" ofType="com.web.library.dao.generate.entity.TUserInfo" resultMap="com.web.library.dao.generate.entity.TUserInfoMapper.BaseResultMap"/>
+</resultMap>
+
+  <!-- 図書一覧情報を取得する -->
+  <select id="selectBookInfo"  parameterType="java.lang.String" resultMap="BaseResultMap">
+  <![CDATA[
+    SELECT
+        TBI.book_id,
+        TBI.title,
+        TBI.winding_next,
+        TBI.series,
+        TBI.version_display,
+        TBI.author,
+        TBI.publisher,
+        TBI.year_publication,
+        TBI.isbn,
+        TBI.number_pages_h_w,
+        TBI.scope_disclosuer,
+        TBI.mng_user_id,
+        TBS.book_num_lending,
+        TBS.book_lend_status,
+        TBI.book_registe_date
+    FROM
+        T_BOOK_INFO TBI
+    INNER JOIN
+        T_BOOK_STATUS TBS ON TBI.book_id = TBS.book_id
+    ]]>
+  </select>
+
+  <!-- チェックした図書一覧を取得する -->
+  <select id="selectCheckedBooksList" resultMap="BaseResultMap">
+    SELECT
+        TBI.book_id,
+        TBI.title,
+        TBI.winding_next,
+        TBI.series,
+        TBI.version_display,
+        TBI.author,
+        TBI.publisher,
+        TBI.year_publication,
+        TBI.isbn,
+        TBI.number_pages_h_w,
+        TBI.scope_disclosuer,
+        TBI.mng_user_id,
+        TBS.book_num_lending,
+        TBS.book_lend_status,
+        TBI.book_registe_date
+    FROM
+        T_BOOK_INFO TBI
+    INNER JOIN
+        T_BOOK_STATUS TBS ON TBI.book_id = TBS.book_id
+    WHERE
+        TBI.book_id IN
+     <foreach item="item" index="index" collection="checkedList"
+              open="(" separator="," close=")">
+       #{item}
+     </foreach>
+  </select>
+
+</mapper>
+
